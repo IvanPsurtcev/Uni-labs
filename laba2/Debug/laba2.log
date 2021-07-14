@@ -1,0 +1,7 @@
+﻿  TrainRasp.cpp
+  laba2.cpp
+C:\Users\Ivan Psurtsev\source\repos\laba2\laba2\laba2.cpp(61,12): warning C4244: аргумент: преобразование "time_t" в "unsigned int", возможна потеря данных
+C:\Users\Ivan Psurtsev\source\repos\laba2\laba2\laba2.cpp(146,20): warning C4018: <: несоответствие типов со знаком и без знака
+C:\Users\Ivan Psurtsev\source\repos\laba2\laba2\laba2.cpp(166,20): warning C4018: <: несоответствие типов со знаком и без знака
+  Создание кода...
+  laba2.vcxproj -> C:\Users\Ivan Psurtsev\source\repos\laba2\Debug\laba2.exe
