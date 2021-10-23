@@ -1,0 +1,169 @@
+#include <stdio.h>
+#include <stdlib.h>
+#include <time.h>
+
+int maxNumber = 100000;
+
+
+// Функция сортировки прямым обменом (метод "пузырька")
+void bubbleSort(float *num, int size)
+{
+    for(int i = 0 ; i < size - 1; i++) { 
+       // сравниваем два соседних элемента.
+       for(int j = 0 ; j < size - i - 1 ; j++) {  
+           if(num[j] > num[j+1]) {           
+              // если они идут в неправильном порядке, то  
+              //  меняем их местами. 
+              int tmp = num[j];
+              num[j] = num[j+1] ;
+              num[j+1] = tmp; 
+           }
+        }
+    }
+ }
+
+void mergeSort(float *a,int n)
+
+{
+int step = 1; // шаг разбиения последовательности
+float *temp = (float*)malloc(n * sizeof(temp)); // дополнительный массив
+while (step < n) // пока шаг меньше длины массива
+{
+int index = 0; // индекс результирующего массива
+int l = 0; // левая граница участка
+int m = l + step; // середина участка
+int r = l + step * 2; // правая граница участка
+
+do
+{
+m = m < n ? m : n; // сортируемый участок не выходит за границы последовательности
+r = r < n ? r : n;
+int i1 = l, i2 = m; // индексы сравниваемых элементов
+for (; i1 < m && i2 < r; ) // пока i1 не дошёл до середины и i2 не дошёл до конца
+{
+if (a[i1] < a[i2]) { temp[index++] = a[i1++]; } // заполняем участок результирующей последовательности
+else { temp[index++] = a[i2++]; }
+}
+// Или i1 < m или i2 < r - только один из операторов while может выполниться
+while (i1 < m) temp[index++] = a[i1++]; // заносим оставшиеся элементы сортируемых участков
+while (i2 < r) temp[index++] = a[i2++]; // в результирующий массив
+l += step * 2; // перемещаемся на следующий сортируемый участок
+m += step * 2;
+r += step * 2;
+} while (l < n); // пока левая граница сортируемого участка - в пределах последоватльности
+for (int i = 0; i < n; i++) // переносим сформированный массив обратно в a
+a[i] = temp[i];
+step *= 2; // увеличиваем в 2 раза шаг разбиения
+}
+}
+
+// Функция "просеивания" через кучу - формирование кучи
+void siftDown(float *numbers, int root, int bottom)
+{
+  int maxChild; // индекс максимального потомка
+  int done = 0; // флаг того, что куча сформирована
+  // Пока не дошли до последнего ряда
+  while ((root * 2 <= bottom) && (!done)) 
+  {
+    if (root * 2 == bottom)    // если мы в последнем ряду, 
+      maxChild = root * 2;    // запоминаем левый потомок
+    // иначе запоминаем больший потомок из двух
+    else if (numbers[root * 2] > numbers[root * 2 + 1])
+      maxChild = root * 2;
+    else
+      maxChild = root * 2 + 1;
+    // если элемент вершины меньше максимального потомка
+    if (numbers[root] < numbers[maxChild]) 
+    {
+      float temp = numbers[root]; // меняем их местами
+      numbers[root] = numbers[maxChild];
+      numbers[maxChild] = temp;
+      root = maxChild;
+    }
+    else // иначе
+      done = 1; // пирамида сформирована
+  }
+}
+// Функция сортировки на куче
+void heapSort(float *numbers, int array_size) 
+{
+  // Формируем нижний ряд пирамиды
+  for (int i = (array_size / 2) - 1; i >= 0; i--)
+    siftDown(numbers, i, array_size - 1);
+  // Просеиваем через пирамиду остальные элементы
+  for (int i = array_size - 1; i >= 1; i--)
+  {
+    float temp = numbers[0];
+    numbers[0] = numbers[i];
+    numbers[i] = temp;
+    siftDown(numbers, 0, i - 1);
+  }
+}
+int scanf_n()
+
+{
+int n;
+do
+{
+printf("Введите размер массива\n");//вывод указания
+scanf("%d", &n);//ввод количества столбцов
+}while(n > maxNumber || n < 1);//проверка ввода
+return n;//возвращение количества столбцов
+}
+
+
+void massiveOutput(float* a, int size_n)//функция для вывода
+{
+int i;
+for (i = 0; i < size_n; i++)
+{
+printf("a[%d]=%lld; ", i, a[i]);//вывод
+}}
+
+float* makearray(int size_n, float *a_merge, float *a_pyramid)//функция для объявление массива, и считывания
+{
+float* a_bubble;//объявление массива
+a_bubble = (float*)malloc(size_n* sizeof(float));//объявление массива
+int i;
+for (int i = 0; i < size_n; i++)
+{
+//array[i] = size_n - i;
+a_bubble[i] = rand();//заполнение функцией рандомных чисел
+a_merge[i] = a_bubble[i];
+a_pyramid[i]=a_bubble[i];
+}
+//massiveOutput(a_shaker, size_n);
+//massiveOutput(a_quick, size_n);
+//massiveOutput(a_merge, size_n);
+printf("Произошло заполнение массива \n");
+return a_bubble;//возвращение массива
+}
+
+int main()
+{
+int n;
+n=scanf_n();
+float *a_merge = (float*)malloc(n* sizeof(float));
+float *a_pyramid = (float*)malloc(n* sizeof(float));
+float *a_bubble=makearray(n,&*a_merge,&*a_pyramid);
+//massiveOutput(array, n);
+//printf("Исходный массив \n");
+clock_t begin1 = clock();
+bubbleSort(a_bubble, n);
+clock_t end1 = clock();
+double time_spent1 = (double)(end1 - begin1) / CLOCKS_PER_SEC;
+printf("time consume on bubble%lf \n", time_spent1);
+clock_t begin2 = clock();
+heapSort(a_pyramid, n);
+clock_t end2 = clock();
+double time_spent2 = (double)(end2 - begin2) / CLOCKS_PER_SEC;
+printf("time consume on pyramid%lf \n", time_spent2);
+//massiveOutput(a, n);
+clock_t begin3 = clock();
+mergeSort(a_merge,n);
+//massiveOutput(array, n);
+clock_t end3 = clock();
+double time_spent3 = (double)(end3 - begin3) / CLOCKS_PER_SEC;
+printf("time consume on merge%lf \n", time_spent3);
+return 0;
+}

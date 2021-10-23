@@ -1,0 +1,165 @@
+#include <stdio.h>
+#include <locale.h>
+#include <string.h>
+#include <malloc.h>
+#include <random>
+#include <time.h>
+
+const int MAX_LEN = 100;
+
+void create_file_first_task(int n)
+{
+	setlocale(LC_ALL, "rus");
+	srand(time(0));
+	FILE *f = fopen("input", "wb");
+	int a, sign;
+	for (int i = 0; i < n; i++) {
+		a = rand();
+		sign = rand() % 2;
+		if (sign)
+			a = -a;
+		fwrite(&a, sizeof(int), 1, f);
+	}
+	fclose(f);
+}
+
+int print_bin(char* f_name)
+{
+	FILE* f = fopen(f_name, "r");
+	if (!f) {
+		printf("Неудалось открыть файл \"%s\" для чтения\n", f_name);
+		return -1;
+	}
+	int a;
+	fread(&a, sizeof(int), 1, f);
+	printf("элементы бинарного файла \"%s\":\n", f_name);
+	while (!feof(f)) {
+		printf("%d, ", a);
+		fread(&a, sizeof(int), 1, f);
+	}
+	putc('\n', stdout);
+	fclose(f);
+	return 0;
+}
+
+int first_task(void) 
+{
+	char* f_name;
+	f_name = (char*)malloc(6);
+	strcpy(f_name, "input");
+	const int number_of_numbers = 20;
+	create_file_first_task(number_of_numbers);
+	FILE* f = fopen(f_name, "rb");
+	if (!f) {
+		printf("Неудалось открыть файл для чтения\n");
+		return -1;
+	}
+	print_bin(f_name);
+	int max = 0, cur, last = -1, i = 0;
+	int* arr;
+	arr = (int*)malloc(1);
+	fread(&cur, sizeof(int), 1, f);
+	while (!feof(f)) {
+		arr = (int*) realloc(arr, sizeof(int) * (i + 1));
+		arr[i] = cur;
+		if (cur < 0) {
+			if (cur > max || last == -1)
+				max = cur;
+			last = i;
+		}
+		fread(&cur, sizeof(int), 1, f);
+		i++;
+	}
+	fclose(f);
+
+	if (last < 0) {
+		printf("в файле отсутствуют отрицательные числа\n");
+		return -2;
+	}
+
+	printf("Максимальный отрицательный элемент: %d\n", max);
+
+	arr = (int*)realloc(arr, sizeof(int) * (i + 1));
+	for (int j = i; j > last + 1; j--) {
+		arr[j] = arr[j - 1];
+	}
+	arr[last + 1] = max;
+
+	FILE* g = fopen(f_name, "wb");
+	if (!g) {
+		printf("Неудалось открыть файл для чтения\n");
+		return -1;
+	}
+
+	fwrite(arr, sizeof(int), i+1, g);
+	fclose(g);
+	print_bin(f_name);
+
+    free(f_name);
+    free(arr);
+	return 0;
+}
+
+int second_task(void)
+{
+	setlocale(LC_ALL, "rus");
+	printf("Введите имя файла для чтения: ");
+	char* f_name;
+	f_name = (char*)malloc(256);
+	scanf("%s", f_name);
+	FILE* f = fopen(f_name, "r");
+	if (!f) {
+		printf("Неудалось открыть файл для чтения\n");
+		return -1;
+	}
+	printf("Введите имя файла для записи: ");
+	scanf("%s", f_name);
+	FILE* g = fopen(f_name, "w");
+	if(!g) {
+		printf("Неудалось открыть файл для записи\n");
+		return -2;
+	}
+
+	char str[MAX_LEN + 1];
+	fgets(str, MAX_LEN, f);
+
+	while (!feof(f)) {
+		int len = strlen(str);
+		for (int i = 0; i < len; i++)
+			if ('a' <= str[i] && str[i] <= 'z')
+				str[i] = 'z' - (str[i] - 'a');
+		fputs(str, g);
+		fgets(str, MAX_LEN, f);
+	}
+	fclose(f);
+	fclose(g);
+    free(f_name);
+	return 0;
+}
+
+void menu(void)
+{
+	setlocale(LC_ALL, "rus");
+	printf("Выберите вариант работы программы:\n");
+	printf("Введите a или b для выполнения соответствующего пункта программы\n");
+	char mode;
+	scanf("%c", &mode);
+	switch (mode)
+	{
+	case 'a':
+		first_task();
+		break;
+	case 'b':
+		second_task();
+		break;
+	default:
+		printf("Введён неверный режим работы программы\n");
+		break;
+	}
+}
+
+int main()
+{
+	menu();
+	return 0;
+}
